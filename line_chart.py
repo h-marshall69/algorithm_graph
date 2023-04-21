@@ -1,15 +1,34 @@
 from tkinter import *
+from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
 import random
 from matplotlib.figure import Figure
+from PIL import Image, ImageTk
 from sorts import *
 
 root = Tk()
+root.title("Pyke player")
 root.geometry("800x550")
-root.title("Transición de gráficos")
 frame1 = Frame(root, highlightbackground="blue", highlightthickness=2)
 frame2 = Frame(root)
+#frame3 = Frame(root)
+
+"""class Table:
+    def __init__(self,master=None):
+        self.master = master
+    
+    def mostrar(self, total_rows=0, total_columns=0):
+        for i in range(total_rows):
+            for j in range(total_columns):
+                self.e = Entry(self.master, width=16, fg='blue',
+                               font=('Arial',10,'bold'))
+                 
+                self.e.grid(row=i, column=j)
+                self.e.insert(END, lst[i][j])
+
+t = Table(master=frame3)
+"""
 
 fig = Figure(figsize=(6, 5), dpi=100)
 ax = fig.add_subplot(111)
@@ -17,7 +36,12 @@ ax = fig.add_subplot(111)
 canvas = FigureCanvasTkAgg(fig, master=frame2)
 canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
+#lst = [['', "# Comparaciones", "# cambios"]]
+
+
 def ordenar():
+    tamano = int(entry1.get())
+    rango = int(entry2.get())
     ax.cla()
     ax.set_ylabel("Tiempo (segundos)")
     ax.set_xlabel("Tamaño de la lista")
@@ -25,9 +49,10 @@ def ordenar():
     canvas.draw()
     tmpx = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     tmpy = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    tamano = 5001
+    #cambios = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    #comparaciones = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     lista = []
-    for i in range(0, tamano, 100):
+    for i in range(0, tamano, rango):
         if var1.get() == True:
             lista = [random.randint(0, tamano - 1) for _ in range(i)]
             if(i == 0):
@@ -80,11 +105,14 @@ def ordenar():
             if(i == 0):
                 ax.plot(0, 0, '#CCCCCC', label="Cocktail Sort")
             order_cocktail_sort(ax, lista, tmpx, tmpy)
-
         canvas.draw()
         root.update()
         time.sleep(0.0001)
         ax.legend()
+
+    #if var1.get() == True:
+        #lst.append(("Bubble Sort", comparaciones[0], cambios[0]))
+    #t.mostrar(len(lst), len(lst[0])) 
 
 var1 = BooleanVar()
 var2 = BooleanVar()
@@ -95,6 +123,16 @@ var6 = BooleanVar()
 var7 = BooleanVar()
 var8 = BooleanVar()
 var9 = BooleanVar()
+
+image = Image.open("example.png")
+photo = ImageTk.PhotoImage(image)
+label1 = Label(frame1, image=photo)
+label2 = Label(frame1, text="Elementos: ", fg="blue", font=("Arial", 16))
+label3 = Label(frame1, text="Rango de recorrido: ", fg="blue", font=("Arial", 16))
+
+entry1 = Entry(frame1, fg="blue", font=("Arial", 16))
+entry2 = Entry(frame1, fg="blue", font=("Arial", 16))
+
 checkbox1 = Checkbutton(frame1, text="Bubble Sort", variable=var1, width=20)
 checkbox2 = Checkbutton(frame1, text="Quicksort", variable=var2, width=20)
 checkbox3 = Checkbutton(frame1, text="Selection Sort", variable=var3, width=20)
@@ -106,8 +144,15 @@ checkbox8 = Checkbutton(frame1, text="Comb Sort", variable=var8, width=20)
 checkbox9 = Checkbutton(frame1, text="Cocktail Sort", variable=var9, width=20)
 simular = Button(frame1, text = "Simular", command=ordenar)
 
-frame1.pack(side="left")
-frame2.pack(side="right")
+frame1.grid(row=0, column=0)
+frame2.grid(row=0, column=1)
+#frame3.grid(row=0, column=2)
+
+label1.pack()
+label2.pack()
+entry1.pack()
+label3.pack()
+entry2.pack()
 
 checkbox1.pack()
 checkbox2.pack()
@@ -119,4 +164,5 @@ checkbox7.pack()
 checkbox8.pack()
 checkbox9.pack()
 simular.pack()
+
 root.mainloop()
