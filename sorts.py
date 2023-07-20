@@ -1,13 +1,12 @@
 import time
-import random
 
+# Función para realizar el Bubble Sort y capturar el tiempo de ejecución
 def bubble_sort(lista):
     n = len(lista)
-
     for i in range(n):
-        for j in range(0, n-i-1):
-            if lista[j] > lista[j+1]:
-                lista[j], lista[j+1] = lista[j+1], lista[j]
+        for j in range(0, n - i - 1):
+            if lista[j] > lista[j + 1]:
+                lista[j], lista[j + 1] = lista[j + 1], lista[j]
 
 def quicksort(lista):
     if len(lista) <= 1:
@@ -145,9 +144,22 @@ def order_bubble_sort(ax, lista, x, y):
     inicio = time.time()
     bubble_sort(lista)
     fin = time.time()
-    ax.plot([x[0], len(lista)], [y[0], (fin - inicio)], "g")
+    nosesdsd = (fin -inicio)
+    ax.plot([x[0], len(lista)], [y[0], nosesdsd], "g")
+    #ax.plot(len(lista), nosesdsd, "g")
     x[0] = len(lista)
     y[0] = fin - inicio
+
+listanose1 = []
+listanose2 = []
+def order_bubble_sort2(lista):
+    inicio = time.time()
+    bubble_sort(lista)
+    fin = time.time()
+    nosesdsd = (fin -inicio)
+    listanose1.append(len(lista))
+    listanose2.append(nosesdsd)
+    
 
 def order_quicksort(ax, lista, x, y):
     inicio = time.time()
