@@ -5,19 +5,23 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import timeit
 import random
-from sorts import *
 
-def quicksort(lista):
-    if len(lista) <= 1:
-        return lista
-    else:
-        pivot = lista[len(lista) // 2]
-        left = [x for x in lista if x < pivot]
-        middle = [x for x in lista if x == pivot]
-        right = [x for x in lista if x > pivot]
-        return quicksort(left) + middle + quicksort(right)
+def selection_sort(lista):
+    n = len(lista)
+    for i in range(n):
+        min_index = i
+        for j in range(i + 1, n):
+            if lista[j] < lista[min_index]:
+                min_index = j
+        lista[i], lista[min_index] = lista[min_index], lista[i]
 
-def burbuja():
+def order_selection_sort(ax, lista, x, y):
+    tiempo_selection_sort = timeit.timeit(lambda: selection_sort(lista), number=1)
+    ax.plot([x[0], len(lista)], [y[0], tiempo_selection_sort], "g")
+    x[0] = len(lista)
+    y[0] = tiempo_selection_sort
+
+def selection_sort_graph():
     tamano = int(element_entry.get())
     rango = int(range_entry.get())
     ax.clear()
@@ -27,14 +31,21 @@ def burbuja():
     # Datos para diferentes casos de Big O
     x = np.arange(0, tamano + 1, rango)
 
-    # Caso O(n) - Linear Time
-    y_on = x / 1000000  # Convertir microsegundos a segundos
+    # Caso O(n log n) - Logarithmic Time
+    y_n_log_n = x * np.log(x) / 1000000  # Convertir microsegundos a segundos
 
     # Caso O(n^2) - Quadratic Time
     y_n2 = (x ** 2) / 1000000  # Convertir microsegundos a segundos
 
-    ax.plot(x, y_on, label="O(n)", color='blue', linestyle='--')
+    # Caso O(n^3) - Cubic Time (opcional, si deseas mostrarlo)
+    y_n3 = (x ** 3) / 1000000  # Convertir microsegundos a segundos
+    # Caso O(1) - Constant Time
+    y_1 = np.full_like(x, 1) / 1000000  # Convertir microsegundos a segundos
+
+    ax.plot(x, y_1, label="O(1)", color='purple', linestyle='--')
+    ax.plot(x, y_n_log_n, label="O(n log n)", color='green', linestyle='--')
     ax.plot(x, y_n2, label="O(n^2)", color='red', linestyle='--')
+    # ax.plot(x, y_n3, label="O(n^3)", color='orange', linestyle='--')  # Descomenta esta línea si deseas mostrar O(n^3)
 
     tmpx = [0]
     tmpy = [0]
@@ -42,11 +53,8 @@ def burbuja():
     for i in range(0, tamano + 1, rango):
         lista = [random.randint(0, tamano - 1) for _ in range(i)]
         if i == 0:
-            ax.plot(0, 0, 'g', label="Bubble Sort")
-        tiempo_bubble_sort = timeit.timeit(lambda: quicksort(lista), number=1)
-        ax.plot([tmpx[0], len(lista)], [tmpy[0], tiempo_bubble_sort], "g")
-        tmpx[0] = len(lista)
-        tmpy[0] = tiempo_bubble_sort
+            ax.plot(0, 0, 'g', label="SelectionSort")
+        order_selection_sort(ax, lista, tmpx, tmpy)
 
     ax.legend()
     canvas.draw()
@@ -69,12 +77,7 @@ ttk.Label(button_frame, text="Rango de recorrido: ", foreground="blue", font=("A
 range_entry = ttk.Entry(button_frame, foreground="blue", font=("Arial", 16))
 range_entry.pack(pady=10)
 
-ttk.Button(button_frame, text='Bubble Sort', command=burbuja).pack(pady=10)
-ttk.Button(button_frame, text='Bubble Sort', command=burbuja).pack(pady=10)
-ttk.Button(button_frame, text='Bubble Sort', command=burbuja).pack(pady=10)
-ttk.Button(button_frame, text='Bubble Sort', command=burbuja).pack(pady=10)
-ttk.Button(button_frame, text='Bubble Sort', command=burbuja).pack(pady=10)
-ttk.Button(button_frame, text='Bubble Sort', command=burbuja).pack(pady=10)
+ttk.Button(button_frame, text='selection sort', command=selection_sort_graph).pack(pady=10)
 
 
 # Crear el gráfico
