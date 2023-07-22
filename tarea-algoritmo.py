@@ -7,69 +7,49 @@ import timeit
 import random
 from sorts import *
 
-def quicksort(lista):
-    if len(lista) <= 1:
-        return lista
-    else:
-        pivot = lista[len(lista) // 2]
-        left = [x for x in lista if x < pivot]
-        middle = [x for x in lista if x == pivot]
-        right = [x for x in lista if x > pivot]
-        return quicksort(left) + middle + quicksort(right)
+def add_asymptotes(ax, tamano, rango):
+    # Complejidad O(n)
+    x = np.linspace(0, tamano, 100)
+    ax.plot(x, x / rango, 'r--', label='O(n)')
 
-def bubble_sort(lista):
-    n = len(lista)
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            if lista[j] > lista[j + 1]:
-                lista[j], lista[j + 1] = lista[j + 1], lista[j]
+    # Complejidad O(n^2)
+    ax.plot(x, (x / rango) ** 2, 'm--', label='O(n^2)')
 
-def selection_sort(lista):
-    n = len(lista)
-    for i in range(n):
-        min_index = i
-        for j in range(i + 1, n):
-            if lista[j] < lista[min_index]:
-                min_index = j
-        lista[i], lista[min_index] = lista[min_index], lista[i]
+    # Complejidad O(log n)
+    ax.plot(x, np.log2(x / rango), 'c--', label='O(log n)')
 
 def order_sort(ax, sort_func, lista, x, y, label, color):
-    tiempo_sort = timeit.timeit(lambda: sort_func(lista), number=1)
-    ax.plot([x[0], len(lista)], [y[0], tiempo_sort], color)
+    tiempo_sort_microseconds = timeit.timeit(lambda: sort_func(lista), number=1)
+    tiempo_sort_seconds = tiempo_sort_microseconds / 1e6  # Convertir microsegundos a segundos
+    tiempo_sort_seconds_10x = tiempo_sort_seconds * 1000000000  # Ajustar a segundos * 10
+    print(tiempo_sort_seconds_10x)
+    ax.plot([x[0], len(lista)], [y[0], tiempo_sort_seconds_10x], color)
     x[0] = len(lista)
-    y[0] = tiempo_sort
+    y[0] = tiempo_sort_seconds_10x
+
 
 def sort_graph(sort_func, label, color):
     tamano = int(element_entry.get())
     rango = int(range_entry.get())
     ax.clear()
-    ax.set_ylabel("Tiempo (segundos)")
+    ax.set_ylabel("Tiempo (segundos * 10)")
     ax.set_xlabel("Tamaño de la lista")
 
-    # Datos para diferentes casos de Big O
-    x = np.arange(0, tamano + 1, rango)
-
-    # Caso O(n) - Linear Time
-    y_on = x / 1000000  # Convertir microsegundos a segundos
-
-    # Caso O(n^2) - Quadratic Time
-    y_n2 = (x ** 2) / 1000000  # Convertir microsegundos a segundos
-
-    # Caso O(n log n) - Logarithmic Time
-    y_n_log_n = x * np.log(x) / 1000000  # Convertir microsegundos a segundos
-
-    ax.plot(x, y_on, label="O(n)", color='blue', linestyle='--')
-    ax.plot(x, y_n2, label="O(n^2)", color='red', linestyle='--')
-    ax.plot(x, y_n_log_n, label="O(n log n)", color='green', linestyle='--')
+    add_asymptotes(ax, tamano, rango)  # Agregar las asíntotas al gráfico
 
     tmpx = [0]
     tmpy = [0]
 
     for i in range(0, tamano + 1, rango):
         lista = [random.randint(0, tamano - 1) for _ in range(i)]
-        if i == 0:
-            ax.plot(0, 0, color, label=label)
-        order_sort(ax, sort_func, lista, tmpx, tmpy, label, color)
+        if sort_func == heapify_wrap:  # Si es heapify_wrap, utilizarlo con los argumentos adicionales
+            if i == 0:
+                ax.plot(0, 0, color, label=label)
+            order_sort(ax, sort_func, lista, tmpx, tmpy, label, color)
+        else:
+            if i == 0:
+                ax.plot(0, 0, color, label=label)
+            order_sort(ax, sort_func, lista, tmpx, tmpy, label, color)
 
     ax.legend()
     canvas.draw()
@@ -83,13 +63,17 @@ root.state('zoomed')  # Mostrar en pantalla completa
 button_frame = ttk.Frame(root)
 button_frame.pack(side=tk.LEFT, fill=tk.Y)
 
+# Definir variables para los valores por defecto de los inputs
+element_default = tk.StringVar(value="2000")  # Valor por defecto de elementos
+range_default = tk.StringVar(value="100")  # Valor por defecto del rango
+
 # Crear los botones y las entradas
 ttk.Label(button_frame, text="Elementos: ", foreground="blue", font=("Arial", 16)).pack(pady=10)
-element_entry = ttk.Entry(button_frame, foreground="blue", font=("Arial", 16))
+element_entry = ttk.Entry(button_frame, foreground="blue", font=("Arial", 16), textvariable=element_default)
 element_entry.pack(pady=10)
 
 ttk.Label(button_frame, text="Rango de recorrido: ", foreground="blue", font=("Arial", 16)).pack(pady=10)
-range_entry = ttk.Entry(button_frame, foreground="blue", font=("Arial", 16))
+range_entry = ttk.Entry(button_frame, foreground="blue", font=("Arial", 16), textvariable=range_default)
 range_entry.pack(pady=10)
 
 ttk.Button(button_frame, text='Bubble Sort', command=lambda: sort_graph(bubble_sort, "Bubble Sort", 'g')).pack(pady=10)
@@ -104,7 +88,7 @@ ttk.Button(button_frame, text='Merge Sort', command=lambda: sort_graph(comb_sort
 ttk.Button(button_frame, text='Heapify', command=lambda: sort_graph(cocktail_sort, "Cocktail Sort", 'y')).pack(pady=10)
 
 # Crear el gráfico
-fig, ax = plt.subplots(figsize=(10, 6))  # Ajustar el tamaño del gráfico
+fig, ax = plt.subplots(figsize=(12, 8))  # Ajustar el tamaño del gráfico
 
 # Crear el widget para mostrar el gráfico
 canvas = FigureCanvasTkAgg(fig, master=root)

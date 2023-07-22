@@ -1,11 +1,13 @@
-import numpy as np
-import tkinter as tk
-from tkinter import ttk
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import timeit
 import random
-from sorts import *
+
+def generate_sorted_list(size):
+    return list(range(size))
+
+def generate_reversed_list(size):
+    return list(range(size, 0, -1))
+
+def generate_random_list(size):
+    return [random.randint(0, size) for _ in range(size)]
 
 def quicksort(lista):
     if len(lista) <= 1:
@@ -33,89 +35,108 @@ def selection_sort(lista):
                 min_index = j
         lista[i], lista[min_index] = lista[min_index], lista[i]
 
-def order_sort(ax, sort_func, lista, x, y, label, color):
-    tiempo_sort = timeit.timeit(lambda: sort_func(lista), number=1)
-    ax.plot([x[0], len(lista)], [y[0], tiempo_sort], color)
-    x[0] = len(lista)
-    y[0] = tiempo_sort
+def shell_sort(lista):
+    n = len(lista)
+    gap = n // 2
+    while gap > 0:
+        for i in range(gap, n):
+            temp = lista[i]
+            j = i
+            while j >= gap and lista[j - gap] > temp:
+                lista[j] = lista[j - gap]
+                j -= gap
+            lista[j] = temp
+        gap //= 2
 
-def sort_graph(sort_func, label, color):
-    tamano = int(element_entry.get())
-    rango = int(range_entry.get())
-    ax.clear()
-    ax.set_ylabel("Tiempo (segundos)")
-    ax.set_xlabel("Tamaño de la lista")
+def merge_sort(lista):
+    if len(lista) > 1:
+        mid = len(lista) // 2
+        left_half = lista[:mid]
+        right_half = lista[mid:]
 
-    # Datos para diferentes casos de Big O
-    x = np.arange(0, tamano + 1, rango)
+        merge_sort(left_half)
+        merge_sort(right_half)
 
-    # Caso O(n) - Linear Time
-    y_on = x / 1000000  # Convertir microsegundos a segundos
+        i, j, k = 0, 0, 0
 
-    # Caso O(n^2) - Quadratic Time
-    y_n2 = (x ** 2) / 1000000  # Convertir microsegundos a segundos
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i] < right_half[j]:
+                lista[k] = left_half[i]
+                i += 1
+            else:
+                lista[k] = right_half[j]
+                j += 1
+            k += 1
 
-    # Caso O(n log n) - Logarithmic Time
-    y_n_log_n = x * np.log(x) / 1000000  # Convertir microsegundos a segundos
+        while i < len(left_half):
+            lista[k] = left_half[i]
+            i += 1
+            k += 1
 
-    ax.plot(x, y_on, label="O(n)", color='blue', linestyle='--')
-    ax.plot(x, y_n2, label="O(n^2)", color='red', linestyle='--')
-    ax.plot(x, y_n_log_n, label="O(n log n)", color='green', linestyle='--')
+        while j < len(right_half):
+            lista[k] = right_half[j]
+            j += 1
+            k += 1
 
-    tmpx = [0]
-    tmpy = [0]
+def heapify(lista, n, i):
+    largest = i
+    l = 2 * i + 1
+    r = 2 * i + 2
 
-    for i in range(0, tamano + 1, rango):
-        lista = [random.randint(0, tamano - 1) for _ in range(i)]
-        if i == 0:
-            ax.plot(0, 0, color, label=label)
-        order_sort(ax, sort_func, lista, tmpx, tmpy, label, color)
+    if l < n and lista[i] < lista[l]:
+        largest = l
 
-    ax.legend()
-    canvas.draw()
+    if r < n and lista[largest] < lista[r]:
+        largest = r
 
-# Crear la ventana Tkinter
-root = tk.Tk()
-root.title('Gráficas de la Big O')
-root.state('zoomed')  # Mostrar en pantalla completa
+    if largest != i:
+        lista[i], lista[largest] = lista[largest], lista[i]
+        heapify(lista, n, largest)
 
-# Crear el Frame para la sección de los botones
-button_frame = ttk.Frame(root)
-button_frame.pack(side=tk.LEFT, fill=tk.Y)
+def heap_sort(lista):
+    n = len(lista)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(lista, n, i)
+    for i in range(n - 1, 0, -1):
+        lista[i], lista[0] = lista[0], lista[i]
+        heapify(lista, i, 0)
 
-# Crear los botones y las entradas
-ttk.Label(button_frame, text="Elementos: ", foreground="blue", font=("Arial", 16)).pack(pady=10)
-element_entry = ttk.Entry(button_frame, foreground="blue", font=("Arial", 16))
-element_entry.pack(pady=10)
+def comb_sort(lista):
+    n = len(lista)
+    gap = n
+    swapped = True
+    while gap > 1 or swapped:
+        gap = int(gap / 1.3)
+        if gap < 1:
+            gap = 1
+        swapped = False
+        for i in range(n - gap):
+            if lista[i] > lista[i + gap]:
+                lista[i], lista[i + gap] = lista[i + gap], lista[i]
+                swapped = True
 
-ttk.Label(button_frame, text="Rango de recorrido: ", foreground="blue", font=("Arial", 16)).pack(pady=10)
-range_entry = ttk.Entry(button_frame, foreground="blue", font=("Arial", 16))
-range_entry.pack(pady=10)
+def cocktail_sort(lista):
+    n = len(lista)
+    swapped = True
+    start = 0
+    end = n - 1
+    while (swapped == True):
+        swapped = False
+        for i in range(start, end):
+            if (lista[i] > lista[i + 1]):
+                lista[i], lista[i + 1] = lista[i + 1], lista[i]
+                swapped = True
+        if (swapped == False):
+            break
+        swapped = False
+        end = end - 1
+        for i in range(end - 1, start - 1, -1):
+            if (lista[i] > lista[i + 1]):
+                lista[i], lista[i + 1] = lista[i + 1], lista[i]
+                swapped = True
+        start = start + 1
 
-ttk.Button(button_frame, text='Bubble Sort', command=lambda: sort_graph(bubble_sort, "Bubble Sort", 'g')).pack(pady=10)
-ttk.Button(button_frame, text='QuickSort', command=lambda: sort_graph(quicksort, "QuickSort", 'b')).pack(pady=10)
-ttk.Button(button_frame, text='Selection Sort', command=lambda: sort_graph(selection_sort, "Selection Sort", 'y')).pack(pady=10)
-ttk.Button(button_frame, text='Shell Sort', command=lambda: sort_graph(shell_sort, "Bubble Sort", 'g')).pack(pady=10)
-ttk.Button(button_frame, text='Merge Sort', command=lambda: sort_graph(merge_sort, "Merge Sort", 'b')).pack(pady=10)
-ttk.Button(button_frame, text='Heap Sort', command=lambda: sort_graph(heap_sort, "Heap Sort", 'y')).pack(pady=10)
-ttk.Button(button_frame, text='Merge Sort', command=lambda: sort_graph(merge_sort, "Merge Sort", 'b')).pack(pady=10)
-ttk.Button(button_frame, text='Heapify', command=lambda: sort_graph(heapify, "Heapify", 'y')).pack(pady=10)
-ttk.Button(button_frame, text='Merge Sort', command=lambda: sort_graph(comb_sort, "Comb Sort", 'b')).pack(pady=10)
-ttk.Button(button_frame, text='Heapify', command=lambda: sort_graph(cocktail_sort, "Cocktail Sort", 'y')).pack(pady=10)
-
-# Crear el gráfico
-fig, ax = plt.subplots(figsize=(10, 6))  # Ajustar el tamaño del gráfico
-
-# Crear el widget para mostrar el gráfico
-canvas = FigureCanvasTkAgg(fig, master=root)
-canvas.draw()
-
-# Agregar la figura del gráfico a un Frame para ubicarla a la derecha de los botones
-graph_frame = ttk.Frame(root)
-graph_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-graph_frame.grid_rowconfigure(0, weight=1)
-graph_frame.grid_columnconfigure(0, weight=1)
-
-# Mostrar la ventana
-root.mainloop()
+def heapify_wrap(lista):
+    n = len(lista)
+    for i in range(n, -1, -1):
+        heapify(lista, n, i)
