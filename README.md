@@ -8,7 +8,7 @@ Graficos de algoritmos de ordenamiento
 
 ## Screenshots
 
-![App Screenshot](https://github.com/h-marshall69/algorithm_graph/tree/main/assets/a.png)
-![App Screenshot](https://github.com/h-marshall69/algorithm_graph/tree/main/assets/b.png)
-![App Screenshot](https://github.com/h-marshall69/algorithm_graph/tree/main/assets/c.png)
-![App Screenshot](https://github.com/h-marshall69/algorithm_graph/tree/main/assets/d.png)
+![App Screenshot](https://github.com/h-marshall69/algorithm_graph/blob/main/assets/a.png)
+![App Screenshot](https://github.com/h-marshall69/algorithm_graph/blob/main/assets/a.png)
+![App Screenshot](https://github.com/h-marshall69/algorithm_graph/blob/main/assets/a.png)
+![App Screenshot](https://github.com/h-marshall69/algorithm_graph/blob/main/assets/a.png)
